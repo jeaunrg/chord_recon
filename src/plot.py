@@ -22,7 +22,7 @@ def plot_fft(frequencies, intensities, ax=None):
     ax.plot(frequencies, intensities)
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('Amplitude')
-    ax.set_title('Spectrum Recording on Piano')
+    ax.set_title('Spectrum')
     ax.set_ylim((0, 3000))
     ax.set_xlim((0, 2000))
     ax.grid()

@@ -4,7 +4,6 @@ import queue
 import sounddevice as sd
 from matplotlib.animation import FuncAnimation
 import numpy as np
-from collections import Counter
 
 
 VOLUME = 0.3
@@ -12,9 +11,9 @@ INTERVAL = 30
 DOWNSAMPLE = 1
 SAMPLERATE = 44100
 WINDOW = 200
-rm_duplicate = False
 CHORD_SIZE = 1
 SKIP_PITCH = False
+rm_duplicate = False
 
 # -------------------------------- INITIALIZE ---------------------------------#
 NOTES = []
