@@ -6,17 +6,18 @@ from matplotlib.animation import FuncAnimation
 import numpy as np
 
 
-VOLUME = 0.3
+CHORD_SIZE = 3
+VOLUME = 1
 INTERVAL = 30
 DOWNSAMPLE = 1
 SAMPLERATE = 44100
 WINDOW = 200
-CHORD_SIZE = 1
-SKIP_PITCH = False
+SKIP_PITCH = True
 rm_duplicate = False
 
 # -------------------------------- INITIALIZE ---------------------------------#
-NOTES = []
+# NOTES = []
+NOTES = {}
 
 q = queue.Queue()
 q2 = queue.Queue()
@@ -29,7 +30,8 @@ frequencies, intensities = core.apply_fft(signal)
 fig = plt.figure()
 ax1 = plot.plot_signal(signal, fig.add_subplot(311))
 ax2 = plot.plot_fft(frequencies, intensities, fig.add_subplot(312))
-piano = plot.Piano(fig.add_subplot(313))
+ax3 = plot.plot_background(200, 'hsv', fig.add_subplot(325))
+piano = plot.Piano(fig.add_subplot(326))
 plt.tight_layout()
 # ---------------------------------- PROCESS ----------------------------------#
 def record_callback(indata, outdata, frames, time, status):
@@ -54,14 +56,20 @@ def update_record(frame):
     _, intensities = core.apply_fft(signal, SAMPLERATE, rm_duplicate=rm_duplicate)
     if intensities[0] > 1:
         chord = core.find_chord(frequencies, intensities, chord_size=CHORD_SIZE, skip_pitch=SKIP_PITCH)
-        NOTES.append(chord[0])
-        if len(NOTES) > 5:
-            NOTES = NOTES[1:]
-        if len(np.unique(NOTES)) == 1:
-            piano.highlight(NOTES[0])
-        ax2._children[0].set_ydata(intensities)
+        cvalues = []
+        for i, n in enumerate(chord):
+            if n not in NOTES:
+                NOTES[n] = 0
+            cvalues += [plot.NOTES.index(n)] * (CHORD_SIZE - i)
+            NOTES[n] += CHORD_SIZE - i
+        piano.highlights(NOTES)
 
-    return [ax1._children[0], ax2._children[0], piano.highlighter] + list(piano.keys.values())
+        ax2._children[0].set_ydata(intensities)
+        color_value = int(np.round(np.mean(cvalues), 0)) / len(plot.NOTES)
+        ax3._children[0].set_data([[color_value]])
+    else:
+        NOTES = {k: 0 for k in NOTES.keys()}
+    return [ax1._children[0], ax2._children[0], ax3._children[0]] + [k.highlighter for k in piano.keys.values()] + list(piano.keys.values())
 
 
 stream = sd.Stream(channels=1, callback=record_callback)

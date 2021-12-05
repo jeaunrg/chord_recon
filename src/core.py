@@ -6,6 +6,8 @@ import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
 note_frequencies = pd.read_csv(os.path.join(dir_path, '..', 'data', 'note_frequencies.csv'),
                                sep=';', header=None, encoding='latin-1', index_col=0)
+min_frequency, max_frequency = note_frequencies.values.min(), note_frequencies.values.max()
+
 
 def write_sound(sample, filename, fs=44100):
     sf.write(filename, sample, fs)
