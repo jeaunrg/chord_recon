@@ -1,4 +1,3 @@
-# chord_recon
 Recognize chords and notes from sounds (piano, voice, etc...) 
 ---
 - "chord_recognition" script is used to find notes from previous recorded chord.
